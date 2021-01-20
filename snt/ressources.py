@@ -80,12 +80,12 @@ def extract_geoloc(exif):
                     if v2=='S':
                         latRef = -1
                 elif k2==2: # GPSLatitude (deg, min, sec)
-                    latitude = v2[0][0]/v2[0][1] + (v2[1][0]/v2[1][1])/60 + (v2[2][0]/v2[2][1])/3600
+                    latitude = float(v2[0]) + float(v2[1])/60 + float(v2[2])/3600
                 elif k2==3: # GPSLongitudeRef
                     if v2=='W':
                         longRef = -1
                 elif k2==4: # GPSLongitude (deg, min, sec)
-                    longitude = v2[0][0]/v2[0][1] + (v2[1][0]/v2[1][1])/60 + (v2[2][0]/v2[2][1])/3600
+                    longitude = float(v2[0]) + float(v2[1])/60 + float(v2[2])/3600
 
     latitude_photo, longitude_photo = (latRef*latitude, longRef*longitude)
     return (latitude_photo, longitude_photo)
