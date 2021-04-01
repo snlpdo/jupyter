@@ -38,14 +38,9 @@ def analyse(image, nb_col, nb_ligne):
     ROUGE = (255,0,0)
     sz_h = image.width/nb_col
     sz_v = image.height/nb_ligne
-    image_graphe = image.copy()
-    draw = ImageDraw.Draw(image_graphe)
     
     for i in range(nb_ligne):
         for j in range(nb_col):
-            draw.ellipse([sz_h/2+j*sz_h-3, sz_v/2+i*sz_v-3, sz_h/2+j*sz_h+3, sz_v/2+i*sz_v+3], fill=ROUGE)
-            draw.text((sz_h/2+j*sz_h-10, sz_v/2+i*sz_v-10), f"{i},{j}",fill=NOIR)#, font=font)
-
             graphe[(i,j)] = []
             x = sz_h/2+j*sz_h
             y = sz_h/2+i*sz_v
@@ -56,7 +51,6 @@ def analyse(image, nb_col, nb_ligne):
             else:
                 if i>0: 
                     graphe[(i,j)].append((i-1,j))
-                    draw.line([sz_h/2+j*sz_h,sz_v/2+i*sz_v,sz_h/2+j*sz_h,sz_v/2+(i-1)*sz_v],fill=NOIR)
                 
             # Bordure droite
             if detection_mur(image,int(x),int(y),int(x+sz_h),int(y)):
@@ -64,7 +58,6 @@ def analyse(image, nb_col, nb_ligne):
             else:
                 if j<nb_col-1:
                     graphe[(i,j)].append((i,j+1))
-                    draw.line([sz_h/2+j*sz_h,sz_v/2+i*sz_v,sz_h/2+(j+1)*sz_h,sz_v/2+i*sz_v],fill=NOIR)
                     
             # Bordure basse
             if detection_mur(image,int(x),int(y),int(x),int(y+sz_v)):
@@ -72,7 +65,6 @@ def analyse(image, nb_col, nb_ligne):
             else:
                 if i<nb_ligne-1:
                     graphe[(i,j)].append((i+1,j))
-                    draw.line([sz_h/2+j*sz_h,sz_v/2+i*sz_v,sz_h/2+j*sz_h,sz_v/2+(i+1)*sz_v],fill=NOIR)
                     
             # Bordure gauche
             if detection_mur(image,int(x),int(y),int(x-sz_h),int(y)):
@@ -80,14 +72,18 @@ def analyse(image, nb_col, nb_ligne):
             else:
                 if j>0:
                     graphe[(i,j)].append((i,j-1))
-                    draw.line([sz_h/2+j*sz_h,sz_v/2+i*sz_v,sz_h/2+(j-1)*sz_h,sz_v/2+i*sz_v],fill=NOIR)
                     
-    return graphe, image_graphe, contours
+    return graphe, contours
 
 def dessiner_labyrinthe(bordures, sz=40):
     # Dessiner le labyrinthe
     penup()
     speed("fastest")
+    home()
+    backward(len(bordures[0])/2*sz)
+    right(90)
+    backward(len(bordures)/2*sz)
+    left(90)
 
     # Lignes horizontales (depuis le côté supérieur haut) correspondant aux bordures
     # supérieures de chaque cellule
@@ -193,9 +189,14 @@ def dessiner_labyrinthe(bordures, sz=40):
     penup()
     right(90)
 
-def depart_tortue(ligne, colonne, direction='droite', sz=40):
+def depart_tortue(ligne, colonne, bordures, direction='droite', sz=40):
     penup()
     home()
+    backward(len(bordures[0])/2*sz)
+    right(90)
+    backward(len(bordures)/2*sz)
+    left(90)
+    
     color('red')
     forward(colonne*sz+sz/2)
     right(90)
@@ -215,7 +216,7 @@ def dessiner_parcours(bordures, parcours, direction='droite', sz=40):
     dessiner_labyrinthe(bordures, sz)
     
     depart = parcours[0]
-    depart_tortue(depart[0], depart[1], direction, sz)
+    depart_tortue(depart[0], depart[1], bordures, direction, sz)
     
     speed('slow')
     i_prev, j_prev = parcours[0]
