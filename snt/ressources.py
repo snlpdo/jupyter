@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
 ''' 
 Constantes et fonctions qui permettent de récupérer des tuiles d'images
 du site Géoportail.
@@ -69,13 +69,13 @@ def geotuile(latitude, longitude, niveau=7, ortho=False, dispLoc=False, dispInfo
 def print_exif(exif):
     for key,value in exif.items():
         print(TAGS.get(key), ': ', value)
-        
+
 def extract_geoloc(exif):
     latRef, longRef = 1, 1
     latitude, longitude = 0, 0
     for key, value in exif.items(): # Boucler sur les données GPS
         if TAGS.get(key)=='GPSInfo':
-            for k2, v2 in value.items():
+            for k2, v2 in exif.get_ifd(key).items():
                 if k2==1: # GPSLatitudeRef
                     if v2=='S':
                         latRef = -1
@@ -89,3 +89,4 @@ def extract_geoloc(exif):
 
     latitude_photo, longitude_photo = (latRef*latitude, longRef*longitude)
     return (latitude_photo, longitude_photo)
+        
